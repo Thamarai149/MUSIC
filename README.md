@@ -66,12 +66,17 @@ private static final String PASSWORD = "Thamarai@2006"; // Your MySQL password
 
 ### 3. Run the Application
 
-**Option A: Using pre-compiled version (Ready to use)**
+**Option A: Using batch file (Windows)**
+```bash
+run_application.bat
+```
+
+**Option B: Using pre-compiled version (Ready to use)**
 ```bash
 java -cp "target/classes;lib/mysql-connector-j-8.0.33.jar" com.railway.RailwayReservationSystem
 ```
 
-**Option B: Using Maven**
+**Option C: Using Maven (if installed)**
 ```bash
 mvn clean compile
 mvn exec:java -Dexec.mainClass="com.railway.RailwayReservationSystem"
@@ -89,7 +94,7 @@ The application provides an intuitive menu-driven interface:
 4. View Ticket Details     # Check specific ticket information
 5. View My Tickets         # See all tickets for a passenger
 6. Update Passenger Details # Modify passenger name, email, phone
-7. Print Ticket            # Generate professional ticket printout (Console/PDF)
+7. Print Ticket            # Generate professional ticket printout (Console/HTML)
 8. Exit                    # Close the application
 ```
 

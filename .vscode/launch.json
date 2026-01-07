@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Railway Reservation System",
+            "request": "launch",
+            "mainClass": "com.railway.RailwayReservationSystem",
+            "projectName": "railway-reservation-system",
+            "classPaths": [
+                "target/classes",
+                "lib/mysql-connector-j-8.0.33.jar"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

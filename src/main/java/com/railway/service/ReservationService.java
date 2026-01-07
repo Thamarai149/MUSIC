@@ -128,18 +128,19 @@ public class ReservationService {
             return;
         }
         
-        // Generate PDF filename
+        // Generate HTML filename
         String fileName = "Ticket_" + ticket.getTicketId() + "_" + 
-                         ticket.getPassengerName().replaceAll("\\s+", "_") + ".pdf";
+                         ticket.getPassengerName().replaceAll("\\s+", "_") + ".html";
         String outputPath = "tickets/" + fileName;
         
-        // Generate PDF
+        // Generate HTML ticket (can be printed as PDF from browser)
         if (PDFTicketGenerator.generateTicketPDF(ticket, train, outputPath)) {
-            System.out.println("\n[SUCCESS] PDF ticket generated successfully!");
+            System.out.println("\n[SUCCESS] HTML ticket generated successfully!");
             System.out.println("[FILE] File saved as: " + outputPath);
             System.out.println("[PATH] Full path: " + System.getProperty("user.dir") + "/" + outputPath);
+            System.out.println("[INFO] Open the HTML file in a browser and use 'Print to PDF' option");
         } else {
-            System.out.println("[ERROR] Error generating PDF ticket!");
+            System.out.println("[ERROR] Error generating HTML ticket!");
         }
     }
     
