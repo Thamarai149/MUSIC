@@ -114,7 +114,7 @@ public class RailwayReservationSystem {
             if ("y".equals(printChoice) || "yes".equals(printChoice)) {
                 System.out.println("\nChoose print format:");
                 System.out.println("1. Console Print (Text)");
-                System.out.println("2. PDF File (Small Size)");
+                System.out.println("2. PDF File (ATVM Style)");
                 System.out.println("3. Both");
                 
                 int choice = getIntInput("Enter your choice (1-3): ");
@@ -174,7 +174,7 @@ public class RailwayReservationSystem {
         
         System.out.println("\nChoose print format:");
         System.out.println("1. Console Print (Text)");
-        System.out.println("2. PDF File (Small Size)");
+        System.out.println("2. PDF File (ATVM Style)");
         System.out.println("3. Both");
         
         int choice = getIntInput("Enter your choice (1-3): ");

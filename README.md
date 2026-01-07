@@ -94,7 +94,7 @@ The application provides an intuitive menu-driven interface:
 4. View Ticket Details     # Check specific ticket information
 5. View My Tickets         # See all tickets for a passenger
 6. Update Passenger Details # Modify passenger name, email, phone
-7. Print Ticket            # Generate professional ticket printout (Console/PDF)
+7. Print Ticket            # Generate colorful professional ticket printout (Console/PDF)
 8. Exit                    # Close the application
 ```
 

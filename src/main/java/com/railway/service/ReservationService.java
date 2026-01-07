@@ -138,7 +138,7 @@ public class ReservationService {
             System.out.println("\n[SUCCESS] PDF ticket generated successfully!");
             System.out.println("[FILE] File saved as: " + outputPath);
             System.out.println("[PATH] Full path: " + System.getProperty("user.dir") + "/" + outputPath);
-            System.out.println("[INFO] Small-sized PDF ticket ready for printing");
+            System.out.println("[INFO] ATVM-style ticket ready for printing");
         } else {
             System.out.println("[ERROR] Error generating PDF ticket!");
         }
