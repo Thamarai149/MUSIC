@@ -36,6 +36,12 @@ public class RailwayReservationSystem {
                     viewPassengerTickets();
                     break;
                 case 6:
+                    updatePassengerDetails();
+                    break;
+                case 7:
+                    printTicket();
+                    break;
+                case 8:
                     System.out.println("Thank you for using Railway Reservation System!");
                     System.exit(0);
                     break;
@@ -55,7 +61,9 @@ public class RailwayReservationSystem {
         System.out.println("3. Cancel Ticket");
         System.out.println("4. View Ticket Details");
         System.out.println("5. View My Tickets");
-        System.out.println("6. Exit");
+        System.out.println("6. Update Passenger Details");
+        System.out.println("7. Print Ticket");
+        System.out.println("8. Exit");
         System.out.println("================");
     }
     
@@ -100,6 +108,33 @@ public class RailwayReservationSystem {
         if (ticketId > 0) {
             System.out.println("\n=== BOOKING CONFIRMATION ===");
             reservationService.viewTicket(ticketId);
+            
+            System.out.print("\nWould you like to print the ticket? (y/n): ");
+            String printChoice = scanner.nextLine().trim().toLowerCase();
+            if ("y".equals(printChoice) || "yes".equals(printChoice)) {
+                System.out.println("\nChoose print format:");
+                System.out.println("1. Console Print (Text)");
+                System.out.println("2. PDF File");
+                System.out.println("3. Both");
+                
+                int choice = getIntInput("Enter your choice (1-3): ");
+                
+                switch (choice) {
+                    case 1:
+                        reservationService.printTicket(ticketId);
+                        break;
+                    case 2:
+                        reservationService.printTicketToPDF(ticketId);
+                        break;
+                    case 3:
+                        reservationService.printTicket(ticketId);
+                        reservationService.printTicketToPDF(ticketId);
+                        break;
+                    default:
+                        System.out.println("Invalid choice! Printing to console...");
+                        reservationService.printTicket(ticketId);
+                }
+            }
         }
     }
     
@@ -131,6 +166,58 @@ public class RailwayReservationSystem {
         System.out.print("Enter your email: ");
         String email = scanner.nextLine().trim();
         reservationService.viewPassengerTickets(email);
+    }
+    
+    private static void printTicket() {
+        System.out.println("\n=== PRINT TICKET ===");
+        int ticketId = getIntInput("Enter Ticket ID to print: ");
+        
+        System.out.println("\nChoose print format:");
+        System.out.println("1. Console Print (Text)");
+        System.out.println("2. PDF File");
+        System.out.println("3. Both");
+        
+        int choice = getIntInput("Enter your choice (1-3): ");
+        
+        switch (choice) {
+            case 1:
+                reservationService.printTicket(ticketId);
+                break;
+            case 2:
+                reservationService.printTicketToPDF(ticketId);
+                break;
+            case 3:
+                reservationService.printTicket(ticketId);
+                reservationService.printTicketToPDF(ticketId);
+                break;
+            default:
+                System.out.println("Invalid choice! Printing to console...");
+                reservationService.printTicket(ticketId);
+        }
+    }
+    
+    private static void updatePassengerDetails() {
+        System.out.println("\n=== UPDATE PASSENGER DETAILS ===");
+        int ticketId = getIntInput("Enter Ticket ID: ");
+        
+        System.out.println("\nCurrent ticket details:");
+        reservationService.viewTicket(ticketId);
+        
+        System.out.print("\nDo you want to update passenger details? (y/n): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+        
+        if ("y".equals(confirm) || "yes".equals(confirm)) {
+            System.out.print("Enter new passenger name: ");
+            String name = scanner.nextLine().trim();
+            System.out.print("Enter new passenger email: ");
+            String email = scanner.nextLine().trim();
+            System.out.print("Enter new passenger phone: ");
+            String phone = scanner.nextLine().trim();
+            
+            reservationService.updatePassengerDetails(ticketId, name, email, phone);
+        } else {
+            System.out.println("Update cancelled.");
+        }
     }
     
     private static int getIntInput(String prompt) {

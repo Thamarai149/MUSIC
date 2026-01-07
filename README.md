@@ -8,7 +8,8 @@ A comprehensive console-based Railway Reservation System built with Java and MyS
 - **🎫 Ticket Booking**: Book tickets with passenger details and automatic seat assignment
 - **💺 Seat Management**: Real-time seat availability tracking with intelligent seat allocation
 - **❌ Ticket Cancellation**: Cancel booked tickets with automatic seat release
-- **📋 Ticket Viewing**: View detailed ticket information and passenger booking history
+- **✏️ Update Passenger Details**: Modify passenger name, email, and phone number for existing bookings
+- **� Ticket  Viewing**: View detailed ticket information and passenger booking history
 - **🗄️ MySQL Integration**: Persistent data storage with relational database
 - **🏛️ Tamil Nadu Routes**: 24+ train routes covering major districts
 
@@ -82,12 +83,14 @@ The application provides an intuitive menu-driven interface:
 
 ```
 === MAIN MENU ===
-1. Search Trains      # Find trains between stations
-2. Book Ticket        # Reserve seats with passenger details
-3. Cancel Ticket      # Cancel existing bookings
-4. View Ticket Details # Check specific ticket information
-5. View My Tickets    # See all tickets for a passenger
-6. Exit              # Close the application
+1. Search Trains           # Find trains between stations
+2. Book Ticket             # Reserve seats with passenger details
+3. Cancel Ticket           # Cancel existing bookings
+4. View Ticket Details     # Check specific ticket information
+5. View My Tickets         # See all tickets for a passenger
+6. Update Passenger Details # Modify passenger name, email, phone
+7. Print Ticket            # Generate professional ticket printout (Console/PDF)
+8. Exit                    # Close the application
 ```
 
 ### Example Workflow:
@@ -95,7 +98,8 @@ The application provides an intuitive menu-driven interface:
 2. **Select**: Choose from available trains (Chennai Express, Kovai Express, etc.)
 3. **Book**: Provide passenger details (name, email, phone)
 4. **Confirm**: Get ticket ID and seat number
-5. **Manage**: View or cancel tickets as needed
+5. **Update**: Modify passenger details if needed using ticket ID
+6. **Manage**: View or cancel tickets as needed
 
 ## 🗄️ Database Schema
 

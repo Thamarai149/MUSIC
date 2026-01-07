@@ -6,6 +6,7 @@ import com.railway.dao.TicketDAO;
 import com.railway.dao.TrainDAO;
 import com.railway.model.Ticket;
 import com.railway.model.Train;
+import com.railway.util.PDFTicketGenerator;
 
 public class ReservationService {
     private final TrainDAO trainDAO;
@@ -112,6 +113,158 @@ public class ReservationService {
             System.out.println("Arrival: " + train.getArrivalTime());
         }
         System.out.println("=====================");
+    }
+    
+    public void printTicketToPDF(int ticketId) {
+        Ticket ticket = ticketDAO.getTicketById(ticketId);
+        if (ticket == null) {
+            System.out.println("Ticket not found!");
+            return;
+        }
+        
+        Train train = trainDAO.getTrainById(ticket.getTrainId());
+        if (train == null) {
+            System.out.println("Train information not found!");
+            return;
+        }
+        
+        // Generate PDF filename
+        String fileName = "Ticket_" + ticket.getTicketId() + "_" + 
+                         ticket.getPassengerName().replaceAll("\\s+", "_") + ".pdf";
+        String outputPath = "tickets/" + fileName;
+        
+        // Generate PDF
+        if (PDFTicketGenerator.generateTicketPDF(ticket, train, outputPath)) {
+            System.out.println("\n[SUCCESS] PDF ticket generated successfully!");
+            System.out.println("[FILE] File saved as: " + outputPath);
+            System.out.println("[PATH] Full path: " + System.getProperty("user.dir") + "/" + outputPath);
+        } else {
+            System.out.println("[ERROR] Error generating PDF ticket!");
+        }
+    }
+    
+    public void printTicket(int ticketId) {
+        Ticket ticket = ticketDAO.getTicketById(ticketId);
+        if (ticket == null) {
+            System.out.println("Ticket not found!");
+            return;
+        }
+        
+        Train train = trainDAO.getTrainById(ticket.getTrainId());
+        if (train == null) {
+            System.out.println("Train information not found!");
+            return;
+        }
+        
+        // Print formatted ticket
+        System.out.println("\n" + "=".repeat(80));
+        System.out.println("                    TAMIL NADU RAILWAY RESERVATION SYSTEM");
+        System.out.println("                         Electronic Reservation Slip (ERS)");
+        System.out.println("=".repeat(80));
+        
+        // Header section
+        System.out.printf("%-25s %-30s %-20s%n", "Booked From", "Boarding At", "To");
+        System.out.printf("%-25s %-30s %-20s%n", 
+                         train.getSource().toUpperCase(), 
+                         train.getSource().toUpperCase(), 
+                         train.getDestination().toUpperCase());
+        
+        System.out.println("-".repeat(80));
+        
+        // Journey details
+        System.out.printf("%-20s %-25s %-15s %-15s%n", 
+                         "Start Date", "Departure", "Arrival", "Class");
+        System.out.printf("%-20s %-25s %-15s %-15s%n", 
+                         ticket.getBookingTime().toLocalDate().toString(),
+                         train.getDepartureTime(),
+                         train.getArrivalTime(),
+                         "GENERAL");
+        
+        System.out.println("-".repeat(80));
+        
+        // Train and booking details
+        System.out.printf("%-15s %-25s %-20s %-15s%n", 
+                         "PNR", "Train No./Name", "Distance", "Booking Date");
+        System.out.printf("%-15s %-25s %-20s %-15s%n", 
+                         "TN" + String.format("%010d", ticketId),
+                         train.getTrainId() + " / " + train.getTrainName(),
+                         "-- KM",
+                         ticket.getBookingTime().toLocalDate().toString());
+        
+        System.out.println("-".repeat(80));
+        
+        // Passenger details header
+        System.out.println("Passenger Details");
+        System.out.printf("%-5s %-25s %-10s %-15s %-20s%n", 
+                         "#", "Name", "Age", "Gender", "Booking Status");
+        System.out.printf("%-5s %-25s %-10s %-15s %-20s%n", 
+                         "1.", ticket.getPassengerName(), "N/A", "N/A", "CONFIRMED");
+        
+        System.out.println("-".repeat(80));
+        
+        // Seat and fare details
+        System.out.printf("%-20s: %-10s%n", "Seat Number", ticket.getSeatNumber());
+        System.out.printf("%-20s: %-10s%n", "Contact", ticket.getPassengerPhone());
+        System.out.printf("%-20s: %-10s%n", "Email", ticket.getPassengerEmail());
+        
+        System.out.println("-".repeat(80));
+        
+        // Payment details
+        System.out.println("Payment Details");
+        System.out.printf("%-30s: Rs. %.2f%n", "Ticket Fare", ticket.getFare());
+        System.out.printf("%-30s: Rs. %.2f%n", "Convenience Fee", 0.0);
+        System.out.printf("%-30s: Rs. %.2f%n", "Total Fare (all inclusive)", ticket.getFare());
+        
+        System.out.println("-".repeat(80));
+        
+        // Transaction details
+        System.out.printf("Transaction ID: TN%s%010d%n", 
+                         ticket.getBookingTime().toLocalDate().toString().replace("-", ""), 
+                         ticketId);
+        
+        System.out.println("-".repeat(80));
+        
+        // Important notes
+        System.out.println("IMPORTANT INSTRUCTIONS:");
+        System.out.println("• Please carry a valid photo ID proof during journey");
+        System.out.println("• Ticket is valid only for the specified train and date");
+        System.out.println("• Report to station at least 30 minutes before departure");
+        System.out.println("• This is a computer generated ticket and does not require signature");
+        
+        System.out.println("-".repeat(80));
+        
+        // Footer
+        System.out.println("                    TAMIL NADU RAILWAY - SAFE & COMFORTABLE JOURNEY");
+        System.out.println("                          Status: " + ticket.getStatus());
+        System.out.println("=".repeat(80));
+        
+        System.out.println("\n*** HAPPY JOURNEY ***");
+    }
+    
+    public boolean updatePassengerDetails(int ticketId, String passengerName, String passengerEmail, String passengerPhone) {
+        Ticket ticket = ticketDAO.getTicketById(ticketId);
+        if (ticket == null) {
+            System.out.println("Ticket not found!");
+            return false;
+        }
+        
+        if (!"BOOKED".equals(ticket.getStatus())) {
+            System.out.println("Cannot update details for cancelled ticket!");
+            return false;
+        }
+        
+        // Update passenger details
+        if (ticketDAO.updatePassengerDetails(ticketId, passengerName, passengerEmail, passengerPhone)) {
+            System.out.println("Passenger details updated successfully!");
+            System.out.println("Updated Details:");
+            System.out.println("Name: " + passengerName);
+            System.out.println("Email: " + passengerEmail);
+            System.out.println("Phone: " + passengerPhone);
+            return true;
+        } else {
+            System.out.println("Error updating passenger details!");
+            return false;
+        }
     }
     
     public void viewPassengerTickets(String passengerEmail) {

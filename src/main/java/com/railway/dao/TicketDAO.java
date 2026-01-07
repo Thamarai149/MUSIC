@@ -110,6 +110,24 @@ public class TicketDAO {
         return tickets;
     }
     
+    public boolean updatePassengerDetails(int ticketId, String passengerName, String passengerEmail, String passengerPhone) {
+        String sql = "UPDATE tickets SET passenger_name = ?, passenger_email = ?, passenger_phone = ? WHERE ticket_id = ? AND status = 'BOOKED'";
+        
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, passengerName);
+            stmt.setString(2, passengerEmail);
+            stmt.setString(3, passengerPhone);
+            stmt.setInt(4, ticketId);
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating passenger details: " + e.getMessage());
+            return false;
+        }
+    }
+    
     public int getNextAvailableSeat(int trainId) {
         String sql = "SELECT COALESCE(MIN(seat_number + 1), 1) as next_seat FROM tickets WHERE train_id = ? AND status = 'BOOKED' AND seat_number + 1 NOT IN (SELECT seat_number FROM tickets WHERE train_id = ? AND status = 'BOOKED')";
         
