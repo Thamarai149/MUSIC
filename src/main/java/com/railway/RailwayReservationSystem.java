@@ -124,11 +124,11 @@ public class RailwayReservationSystem {
                         reservationService.printTicket(ticketId);
                         break;
                     case 2:
-                        reservationService.printTicketToJPG(ticketId);
+                        reservationService.printTicketToPDF(ticketId);
                         break;
                     case 3:
                         reservationService.printTicket(ticketId);
-                        reservationService.printTicketToJPG(ticketId);
+                        reservationService.printTicketToPDF(ticketId);
                         break;
                     default:
                         System.out.println("Invalid choice! Printing to console...");
@@ -174,7 +174,7 @@ public class RailwayReservationSystem {
         
         System.out.println("\nChoose print format:");
         System.out.println("1. Console Print (Text)");
-        System.out.println("2. JPG File (High Quality)");
+        System.out.println("2. PDF File");
         System.out.println("3. Both");
         
         int choice = getIntInput("Enter your choice (1-3): ");
@@ -184,11 +184,11 @@ public class RailwayReservationSystem {
                 reservationService.printTicket(ticketId);
                 break;
             case 2:
-                reservationService.printTicketToJPG(ticketId);
+                reservationService.printTicketToPDF(ticketId);
                 break;
             case 3:
                 reservationService.printTicket(ticketId);
-                reservationService.printTicketToJPG(ticketId);
+                reservationService.printTicketToPDF(ticketId);
                 break;
             default:
                 System.out.println("Invalid choice! Printing to console...");
