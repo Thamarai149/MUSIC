@@ -6,7 +6,7 @@ import com.railway.dao.TicketDAO;
 import com.railway.dao.TrainDAO;
 import com.railway.model.Ticket;
 import com.railway.model.Train;
-import com.railway.util.JPGTicketGenerator;
+import com.railway.util.PDFTicketGenerator;
 
 public class ReservationService {
     private final TrainDAO trainDAO;
@@ -115,7 +115,7 @@ public class ReservationService {
         System.out.println("=====================");
     }
     
-    public void printTicketToJPG(int ticketId) {
+    public void printTicketToPDF(int ticketId) {
         Ticket ticket = ticketDAO.getTicketById(ticketId);
         if (ticket == null) {
             System.out.println("Ticket not found!");
@@ -128,19 +128,19 @@ public class ReservationService {
             return;
         }
         
-        // Generate JPG filename
+        // Generate PDF filename
         String fileName = "Ticket_" + ticket.getTicketId() + "_" + 
-                         ticket.getPassengerName().replaceAll("\\s+", "_") + ".jpg";
+                         ticket.getPassengerName().replaceAll("\\s+", "_") + ".pdf";
         String outputPath = "tickets/" + fileName;
         
-        // Generate JPG ticket (small size, direct JPG format)
-        if (JPGTicketGenerator.generateTicketJPG(ticket, train, outputPath)) {
-            System.out.println("\n[SUCCESS] JPG ticket generated successfully!");
+        // Generate PDF ticket
+        if (PDFTicketGenerator.generateTicketPDF(ticket, train, outputPath)) {
+            System.out.println("\n[SUCCESS] PDF ticket generated successfully!");
             System.out.println("[FILE] File saved as: " + outputPath);
             System.out.println("[PATH] Full path: " + System.getProperty("user.dir") + "/" + outputPath);
-            System.out.println("[INFO] Small-size ticket ready for printing");
+            System.out.println("[INFO] PDF ticket ready for printing");
         } else {
-            System.out.println("[ERROR] Error generating JPG ticket!");
+            System.out.println("[ERROR] Error generating PDF ticket!");
         }
     }
     
