@@ -21,7 +21,9 @@ public class ReservationService {
         return trainDAO.searchTrains(source, destination);
     }
     
-    public int bookTicket(int trainId, String passengerName, String passengerEmail, String passengerPhone) {
+    // Enhanced booking method with new parameters
+    public int bookTicket(int trainId, String passengerName, String passengerEmail, String passengerPhone, 
+                         int passengerAge, String passengerGender, String ticketClass, java.time.LocalDate journeyDate) {
         Train train = trainDAO.getTrainById(trainId);
         if (train == null) {
             System.out.println("Train not found!");
@@ -36,8 +38,21 @@ public class ReservationService {
         // Get next available seat number
         int seatNumber = ticketDAO.getNextAvailableSeat(trainId);
         
-        // Create ticket
-        Ticket ticket = new Ticket(trainId, passengerName, passengerEmail, passengerPhone, seatNumber, train.getFare());
+        // Calculate fare based on class
+        double baseFare = calculateClassFare(train.getFare(), ticketClass);
+        
+        // Generate coach and seat details
+        String coachNumber = generateCoachNumber(ticketClass);
+        String seatNumberStr = coachNumber + "-" + seatNumber;
+        
+        // Create enhanced ticket
+        Ticket ticket = new Ticket(trainId, passengerName, passengerEmail, passengerPhone, 
+                                 passengerAge, passengerGender, seatNumberStr, coachNumber, 
+                                 ticketClass, baseFare, journeyDate);
+        
+        // Set additional details
+        ticket.setIdProofType("AADHAR");
+        ticket.setBerthType(generateBerthType(seatNumber));
         
         // Book ticket in database
         int ticketId = ticketDAO.bookTicket(ticket);
@@ -47,8 +62,10 @@ public class ReservationService {
             if (trainDAO.updateAvailableSeats(trainId, 1)) {
                 System.out.println("Ticket booked successfully!");
                 System.out.println("Ticket ID: " + ticketId);
-                System.out.println("Seat Number: " + seatNumber);
-                System.out.println("Fare: $" + train.getFare());
+                System.out.println("PNR: " + ticket.getPnrNumber());
+                System.out.println("Seat: " + seatNumberStr);
+                System.out.println("Class: " + ticketClass);
+                System.out.println("Total Fare: Rs." + ticket.getTotalFare());
                 return ticketId;
             } else {
                 System.out.println("Error updating seat availability!");
@@ -57,6 +74,44 @@ public class ReservationService {
         } else {
             System.out.println("Error booking ticket!");
             return -1;
+        }
+    }
+    
+    // Keep the old method for backward compatibility
+    public int bookTicket(int trainId, String passengerName, String passengerEmail, String passengerPhone) {
+        return bookTicket(trainId, passengerName, passengerEmail, passengerPhone, 
+                         25, "M", "GENERAL", java.time.LocalDate.now());
+    }
+    
+    private double calculateClassFare(double baseFare, String ticketClass) {
+        switch (ticketClass) {
+            case "SLEEPER": return baseFare * 1.5;
+            case "AC_3_TIER": return baseFare * 2.5;
+            case "AC_2_TIER": return baseFare * 3.5;
+            case "AC_1_TIER": return baseFare * 5.0;
+            default: return baseFare; // GENERAL
+        }
+    }
+    
+    private String generateCoachNumber(String ticketClass) {
+        switch (ticketClass) {
+            case "SLEEPER": return "S" + (int)(Math.random() * 3 + 1); // S1, S2, S3
+            case "AC_3_TIER": return "B" + (int)(Math.random() * 2 + 1); // B1, B2
+            case "AC_2_TIER": return "A" + (int)(Math.random() * 2 + 1); // A1, A2
+            case "AC_1_TIER": return "H" + (int)(Math.random() * 1 + 1); // H1
+            default: return "GS"; // General Seating
+        }
+    }
+    
+    private String generateBerthType(int seatNumber) {
+        int berth = seatNumber % 8;
+        switch (berth) {
+            case 1: case 4: return "LOWER";
+            case 2: case 5: return "MIDDLE";
+            case 3: case 6: return "UPPER";
+            case 7: return "SIDE_LOWER";
+            case 0: return "SIDE_UPPER";
+            default: return "LOWER";
         }
     }
     

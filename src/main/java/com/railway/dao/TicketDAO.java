@@ -1,10 +1,16 @@
 package com.railway.dao;
 
-import com.railway.config.DatabaseConfig;
-import com.railway.model.Ticket;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.railway.config.DatabaseConfig;
+import com.railway.model.Ticket;
 
 public class TicketDAO {
     
@@ -18,8 +24,21 @@ public class TicketDAO {
             stmt.setString(2, ticket.getPassengerName());
             stmt.setString(3, ticket.getPassengerEmail());
             stmt.setString(4, ticket.getPassengerPhone());
-            stmt.setInt(5, ticket.getSeatNumber());
-            stmt.setDouble(6, ticket.getFare());
+            
+            String seatNumber = ticket.getSeatNumber();
+            int numericSeat;
+            if (seatNumber.contains("-")) {
+                numericSeat = Integer.parseInt(seatNumber.split("-")[1]);
+            } else {
+                try {
+                    numericSeat = Integer.parseInt(seatNumber);
+                } catch (NumberFormatException e) {
+                    numericSeat = 1; // Default seat number
+                }
+            }
+            stmt.setInt(5, numericSeat);
+            
+            stmt.setDouble(6, ticket.getTotalFare()); // Use total fare
             stmt.setTimestamp(7, Timestamp.valueOf(ticket.getBookingTime()));
             stmt.setString(8, ticket.getStatus());
             
@@ -53,10 +72,31 @@ public class TicketDAO {
                 ticket.setPassengerName(rs.getString("passenger_name"));
                 ticket.setPassengerEmail(rs.getString("passenger_email"));
                 ticket.setPassengerPhone(rs.getString("passenger_phone"));
-                ticket.setSeatNumber(rs.getInt("seat_number"));
+                
+                // Handle seat number conversion from int to String
+                int seatNum = rs.getInt("seat_number");
+                ticket.setSeatNumber("GS-" + seatNum); // Convert int to String format
+                ticket.setCoachNumber("GS"); // Default coach for legacy data
+                
                 ticket.setFare(rs.getDouble("fare"));
+                ticket.setTotalFare(rs.getDouble("fare")); // Set total fare same as fare for legacy data
+                ticket.setBaseFare(rs.getDouble("fare") * 0.85); // Calculate base fare
+                ticket.setTaxes(rs.getDouble("fare") * 0.15); // Calculate taxes
+                
                 ticket.setBookingTime(rs.getTimestamp("booking_time").toLocalDateTime());
                 ticket.setStatus(rs.getString("status"));
+                
+                // Set default values for new fields
+                ticket.setPassengerAge(25);
+                ticket.setPassengerGender("M");
+                ticket.setTicketClass("GENERAL");
+                ticket.setBerthType("LOWER");
+                ticket.setIdProofType("AADHAR");
+                ticket.setBookingSource("ONLINE");
+                ticket.setPaymentMode("CARD");
+                ticket.setPnrNumber(String.format("%010d", ticket.getTicketId()));
+                ticket.setJourneyDate(ticket.getBookingTime().toLocalDate());
+                
                 return ticket;
             }
         } catch (SQLException e) {
@@ -97,10 +137,31 @@ public class TicketDAO {
                 ticket.setPassengerName(rs.getString("passenger_name"));
                 ticket.setPassengerEmail(rs.getString("passenger_email"));
                 ticket.setPassengerPhone(rs.getString("passenger_phone"));
-                ticket.setSeatNumber(rs.getInt("seat_number"));
+                
+                // Handle seat number conversion from int to String
+                int seatNum = rs.getInt("seat_number");
+                ticket.setSeatNumber("GS-" + seatNum); // Convert int to String format
+                ticket.setCoachNumber("GS"); // Default coach for legacy data
+                
                 ticket.setFare(rs.getDouble("fare"));
+                ticket.setTotalFare(rs.getDouble("fare")); // Set total fare same as fare for legacy data
+                ticket.setBaseFare(rs.getDouble("fare") * 0.85); // Calculate base fare
+                ticket.setTaxes(rs.getDouble("fare") * 0.15); // Calculate taxes
+                
                 ticket.setBookingTime(rs.getTimestamp("booking_time").toLocalDateTime());
                 ticket.setStatus(rs.getString("status"));
+                
+                // Set default values for new fields
+                ticket.setPassengerAge(25);
+                ticket.setPassengerGender("M");
+                ticket.setTicketClass("GENERAL");
+                ticket.setBerthType("LOWER");
+                ticket.setIdProofType("AADHAR");
+                ticket.setBookingSource("ONLINE");
+                ticket.setPaymentMode("CARD");
+                ticket.setPnrNumber(String.format("%010d", ticket.getTicketId()));
+                ticket.setJourneyDate(ticket.getBookingTime().toLocalDate());
+                
                 tickets.add(ticket);
             }
         } catch (SQLException e) {

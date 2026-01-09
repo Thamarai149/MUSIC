@@ -16,8 +16,9 @@ import com.railway.model.Train;
 
 public class PDFTicketGenerator {
 
-    private static final float PAGE_WIDTH = 595;   // A4 width (original size)
-    private static final float PAGE_HEIGHT = 842;  // A4 height (original size)
+    // ===== THERMAL PRINTER SIZE (80mm) =====
+    private static final float PAGE_WIDTH = 226;   // 80mm
+    private static final float PAGE_HEIGHT = 1000; // large height (auto cut)
 
     public static boolean generateTicketPDF(Ticket ticket, Train train, String outputFile) {
         try (PDDocument document = new PDDocument()) {
@@ -32,102 +33,83 @@ public class PDFTicketGenerator {
                     if (logoFile.exists()) {
                         PDImageXObject logoImage = PDImageXObject.createFromFile("src/irctc.png", document);
                         
-                        // Add logo as watermark in background (center, large and light)
-                        float logoWidth = 150;
-                        float logoHeight = 150;
+                        // Add logo as watermark in background (center, light)
+                        float logoWidth = 80;
+                        float logoHeight = 80;
                         float logoX = (PAGE_WIDTH - logoWidth) / 2;
-                        float logoY = (PAGE_HEIGHT - logoHeight) / 2;
+                        float logoY = PAGE_HEIGHT / 2;
                         
-                        // Draw large background logo (watermark effect)
+                        // Draw background logo (watermark effect)
                         cs.drawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
                         
-                        // Add small logo in header (top right)
-                        cs.drawImage(logoImage, 450, PAGE_HEIGHT - 80, 50, 50);
+                        // Add small logo in header
+                        cs.drawImage(logoImage, PAGE_WIDTH - 35, PAGE_HEIGHT - 50, 25, 25);
                     }
                 } catch (IOException e) {
                     System.out.println("Warning: Could not load IRCTC logo - " + e.getMessage());
                 }
                 
-                float y = PAGE_HEIGHT - 50;
+                float y = PAGE_HEIGHT - 20;
 
                 // ===== HEADER =====
-                write(cs, PDType1Font.HELVETICA_BOLD, 20, 50, y, "INDIAN RAILWAYS");
-                write(cs, PDType1Font.HELVETICA_BOLD, 16, 350, y, "E-TICKET");
-                y -= 30;
-                
-                // Divider line
-                cs.moveTo(50, y);
-                cs.lineTo(PAGE_WIDTH - 50, y);
-                cs.stroke();
-                y -= 40;
-
-                // ===== TICKET INFO SECTION =====
-                write(cs, PDType1Font.HELVETICA_BOLD, 14, 50, y, "PASSENGER DETAILS");
-                y -= 25;
-                
-                write(cs, PDType1Font.HELVETICA, 12, 50, y, "PNR Number : " + ticket.getTicketId());
+                writeCentered(cs, PDType1Font.HELVETICA_BOLD, 14, y, "INDIAN RAILWAYS");
+                y -= 18;
+                writeCentered(cs, PDType1Font.HELVETICA, 9, y, "ELECTRONIC TRAIN TICKET");
                 y -= 20;
-                write(cs, PDType1Font.HELVETICA, 12, 50, y, "Passenger Name : " + ticket.getPassengerName());
-                y -= 20;
-                write(cs, PDType1Font.HELVETICA, 12, 50, y, "Seat Number : " + ticket.getSeatNumber());
-                y -= 20;
-                write(cs, PDType1Font.HELVETICA, 12, 50, y, "Booking Status : " + ticket.getStatus());
-                y -= 40;
-
-                // ===== TRAIN DETAILS SECTION =====
-                write(cs, PDType1Font.HELVETICA_BOLD, 14, 50, y, "TRAIN DETAILS");
-                y -= 25;
-                
-                write(cs, PDType1Font.HELVETICA, 12, 50, y, "Train Number : " + train.getTrainId());
-                write(cs, PDType1Font.HELVETICA, 12, 300, y, "Train Name : " + train.getTrainName());
-                y -= 20;
-                
-                write(cs, PDType1Font.HELVETICA, 12, 50, y, "From Station : " + train.getSource());
-                write(cs, PDType1Font.HELVETICA, 12, 300, y, "To Station : " + train.getDestination());
-                y -= 20;
-                
-                write(cs, PDType1Font.HELVETICA, 12, 50, y, "Departure Time : " + train.getDepartureTime());
-                write(cs, PDType1Font.HELVETICA, 12, 300, y, "Arrival Time : " + train.getArrivalTime());
-                y -= 40;
-
-                // ===== JOURNEY & FARE SECTION =====
-                write(cs, PDType1Font.HELVETICA_BOLD, 14, 50, y, "JOURNEY & FARE DETAILS");
-                y -= 25;
-                
-                write(cs, PDType1Font.HELVETICA, 12, 50, y, "Journey Date : " +
-                        ticket.getBookingTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-                write(cs, PDType1Font.HELVETICA, 12, 300, y, "Booking Date : " +
-                        ticket.getBookingTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
-                y -= 20;
-                
-                write(cs, PDType1Font.HELVETICA_BOLD, 12, 50, y, "Total Fare : Rs. " + ticket.getFare());
-                y -= 60;
-
-                // ===== IMPORTANT INSTRUCTIONS =====
-                write(cs, PDType1Font.HELVETICA_BOLD, 12, 50, y, "IMPORTANT INSTRUCTIONS:");
-                y -= 20;
-                write(cs, PDType1Font.HELVETICA, 10, 50, y, "• Please carry a valid photo ID proof during journey");
+                drawLine(cs, y);
                 y -= 15;
-                write(cs, PDType1Font.HELVETICA, 10, 50, y, "• Report at the station at least 30 minutes before departure");
+
+                // ===== TICKET DETAILS =====
+                write(cs, 10, y, "PNR : " + (ticket.getPnrNumber() != null ? ticket.getPnrNumber() : ticket.getTicketId())); 
+                y -= 14;
+                write(cs, 10, y, "Status : " + ticket.getStatus()); 
+                y -= 14;
+                drawLine(cs, y);
                 y -= 15;
-                write(cs, PDType1Font.HELVETICA, 10, 50, y, "• This ticket is valid only for the date and train mentioned above");
+
+                // ===== PASSENGER =====
+                writeAutoScale(cs, PDType1Font.HELVETICA_BOLD, 11, 8, 10, y,
+                        "Passenger: " + ticket.getPassengerName());
+                y -= 14;
+                write(cs, 10, y, "Age: " + ticket.getPassengerAge() + " | Gender: " + ticket.getPassengerGender());
+                y -= 14;
+                write(cs, 10, y, "Seat: " + ticket.getCoachNumber() + "-" + ticket.getSeatNumber());
+                y -= 14;
+                write(cs, 10, y, "Class: " + ticket.getTicketClass() + " | " + ticket.getBerthType());
+                y -= 14;
+                drawLine(cs, y);
                 y -= 15;
-                write(cs, PDType1Font.HELVETICA, 10, 50, y, "• Smoking and consumption of alcohol is prohibited in trains");
-                y -= 40;
+
+                // ===== TRAIN DETAILS =====
+                writeAutoScale(cs, PDType1Font.HELVETICA_BOLD, 11, 8, 10, y,
+                        train.getSource() + " TO " + train.getDestination());
+                y -= 14;
+                writeAutoScale(cs, PDType1Font.HELVETICA, 10, 8, 10, y,
+                        "Train: " + train.getTrainId() + " - " + train.getTrainName());
+                y -= 14;
+                write(cs, 10, y, "Journey: " + (ticket.getJourneyDate() != null ? 
+                        ticket.getJourneyDate().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")) :
+                        ticket.getBookingTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+                y -= 14;
+                write(cs, 10, y, "Base: Rs." + ticket.getBaseFare() + " + Tax: Rs." + ticket.getTaxes());
+                y -= 14;
+                write(cs, 10, y, "Total Fare: Rs. " + ticket.getTotalFare());
+                y -= 20;
+                drawLine(cs, y);
+                y -= 18;
 
                 // ===== FOOTER =====
-                // Bottom divider line
-                cs.moveTo(50, 100);
-                cs.lineTo(PAGE_WIDTH - 50, 100);
-                cs.stroke();
-                
-                write(cs, PDType1Font.HELVETICA_OBLIQUE, 10, 50, 80,
-                        "For any queries, visit www.irctc.co.in | Customer Care: 139");
-                write(cs, PDType1Font.HELVETICA_BOLD, 10, 400, 80, "SAFE JOURNEY!");
+                writeCentered(cs, PDType1Font.HELVETICA_OBLIQUE, 9, y, "Carry " + ticket.getIdProofType() + " ID");
+                y -= 12;
+                writeCentered(cs, PDType1Font.HELVETICA_OBLIQUE, 9, y, "SAFE JOURNEY");
+                y -= 12;
+                writeCentered(cs, PDType1Font.HELVETICA, 7, y, "Booked via " + ticket.getBookingSource());
+                y -= 10;
+                writeCentered(cs, PDType1Font.HELVETICA, 7, y, "IRCTC - Indian Railways");
             }
 
             document.save(outputFile);
-            System.out.println("Original size PDF with IRCTC logo generated successfully: " + outputFile);
+            System.out.println("Thermal Ticket PDF with IRCTC logo generated: " + outputFile);
             return true;
 
         } catch (IOException e) {
@@ -136,13 +118,50 @@ public class PDFTicketGenerator {
         }
     }
 
-    // ===== Utility method for safe text writing =====
-    private static void write(PDPageContentStream cs, PDType1Font font, int fontSize,
-                            float x, float y, String text) throws IOException {
+    // ===== BASIC WRITE =====
+    private static void write(PDPageContentStream cs, int fontSize, float y, String text) throws IOException {
+        cs.beginText();
+        cs.setFont(PDType1Font.HELVETICA, fontSize);
+        cs.newLineAtOffset(10, y);
+        cs.showText(text);
+        cs.endText();
+    }
+
+    // ===== CENTER ALIGN =====
+    private static void writeCentered(PDPageContentStream cs, PDType1Font font, int fontSize, 
+                                    float y, String text) throws IOException {
+        float textWidth = (font.getStringWidth(text) / 1000) * fontSize;
+        float x = (PAGE_WIDTH - textWidth) / 2;
         cs.beginText();
         cs.setFont(font, fontSize);
         cs.newLineAtOffset(x, y);
         cs.showText(text);
         cs.endText();
+    }
+
+    // ===== AUTO SCALE TEXT =====
+    private static void writeAutoScale(PDPageContentStream cs, PDType1Font font, float maxSize, 
+                                     float minSize, float x, float y, String text) throws IOException {
+        float size = maxSize;
+        float maxWidth = PAGE_WIDTH - 20;
+        
+        while (size > minSize) {
+            float width = (font.getStringWidth(text) / 1000) * size;
+            if (width <= maxWidth) break;
+            size -= 0.5f;
+        }
+        
+        cs.beginText();
+        cs.setFont(font, size);
+        cs.newLineAtOffset(x, y);
+        cs.showText(text);
+        cs.endText();
+    }
+
+    // ===== SEPARATOR LINE =====
+    private static void drawLine(PDPageContentStream cs, float y) throws IOException {
+        cs.moveTo(10, y);
+        cs.lineTo(PAGE_WIDTH - 10, y);
+        cs.stroke();
     }
 }
