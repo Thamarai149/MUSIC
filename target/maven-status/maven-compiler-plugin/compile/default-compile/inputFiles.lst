@@ -1,8 +1,8 @@
-C:\console\src\main\java\com\railway\model\Train.java
-C:\console\src\main\java\com\railway\config\DatabaseConfig.java
-C:\console\src\main\java\com\railway\util\PDFTicketGenerator.java
-C:\console\src\main\java\com\railway\model\Ticket.java
-C:\console\src\main\java\com\railway\dao\TicketDAO.java
-C:\console\src\main\java\com\railway\service\ReservationService.java
-C:\console\src\main\java\com\railway\dao\TrainDAO.java
-C:\console\src\main\java\com\railway\RailwayReservationSystem.java
+C:\console\TRS\src\main\java\com\railway\RailwayReservationSystem.java
+C:\console\TRS\src\main\java\com\railway\config\DatabaseConfig.java
+C:\console\TRS\src\main\java\com\railway\dao\TrainDAO.java
+C:\console\TRS\src\main\java\com\railway\util\PDFTicketGenerator.java
+C:\console\TRS\src\main\java\com\railway\model\Ticket.java
+C:\console\TRS\src\main\java\com\railway\dao\TicketDAO.java
+C:\console\TRS\src\main\java\com\railway\model\Train.java
+C:\console\TRS\src\main\java\com\railway\service\ReservationService.java
