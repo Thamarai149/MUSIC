@@ -61,7 +61,7 @@ Update your MySQL password in `src/main/java/com/railway/config/DatabaseConfig.j
 ```java
 private static final String URL = "jdbc:mysql://localhost:3306/railway_db";
 private static final String USERNAME = "root";
-private static final String PASSWORD = "Thamarai@2006"; // Your MySQL password
+private static final String PASSWORD = "Your MySQL password";
 ```
 
 ### 3. Run the Application
